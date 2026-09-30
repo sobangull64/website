@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initLightbox();
   initMobileMenu();
   initDynamicContactForm();
+  initExperienceDeckCarousel();
+  initSkillsVerticalStack();
+  initWorkVerticalStack();
 });
 
 /* ==========================================================================
@@ -164,7 +167,7 @@ function initCustomCursor() {
     dot.style.transform = 'translate(-50%, -50%) scale(1)';
   });
 
-  const hoverables = document.querySelectorAll('a, button, input, select, textarea, .skill-box, .about-feature-card, .edu-card, .exp-card, .hero-face-container, .auton-filter-btn, .auton-arrow-btn, .auton-project-card');
+  const hoverables = document.querySelectorAll('a, button, input, select, textarea, .skill-box, .about-feature-card, .edu-card, .exp-card, .hero-face-container, .auton-filter-btn, .auton-arrow-btn, .auton-project-card, .exp-nav-btn, .exp-dot, .exp-stack-card, .skill-stack-card, .skill-nav-btn, .skill-dot, .work-stack-card, .work-nav-btn, .work-dot');
   hoverables.forEach((el) => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
@@ -187,7 +190,7 @@ function initCustomCursor() {
    4. UNIFIED 3D MAGNETIC TILT & CURSOR SPOTLIGHT PHYSICS
    ========================================================================== */
 function initUnifiedSpotlightTilt() {
-  const tiltElements = document.querySelectorAll('.about-feature-card, .edu-card, .exp-card, .exp-fade-card, .skill-box, .auton-project-card');
+  const tiltElements = document.querySelectorAll('.about-feature-card, .edu-card, .exp-card, .exp-stack-card, .skill-box, .auton-project-card');
 
   tiltElements.forEach((el) => {
     el.addEventListener('mousemove', (e) => {
@@ -236,31 +239,7 @@ function initSkillProgressBars() {
    7. AUTON FRAMER STYLE: PROJECTS FILTER TABS & INTERACTIONS
    ========================================================================== */
 function initAutonProjectsFilter() {
-  const filterBtns = document.querySelectorAll('.auton-filter-btn');
-  const cards = document.querySelectorAll('.auton-project-card');
-
-  if (!filterBtns.length || !cards.length) return;
-
-  filterBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const filterValue = btn.getAttribute('data-filter');
-
-      cards.forEach((card) => {
-        const category = card.getAttribute('data-category');
-        card.classList.remove('auton-card-entering');
-
-        if (filterValue === 'all' || category === filterValue) {
-          card.classList.remove('auton-card-hidden');
-          card.classList.add('auton-card-entering');
-        } else {
-          card.classList.add('auton-card-hidden');
-        }
-      });
-    });
-  });
+  // Handled natively by initWorkVerticalStack for 3D card stack
 }
 
 /* ==========================================================================
@@ -277,6 +256,9 @@ function initLightbox() {
   const projectCards = document.querySelectorAll('.auton-project-card');
   projectCards.forEach((card) => {
     card.addEventListener('click', () => {
+      // Only open lightbox for the active card in focus
+      if (!card.classList.contains('is-active')) return;
+
       const imgPath = card.getAttribute('data-img') || card.querySelector('img')?.src;
       const title = card.getAttribute('data-title') || card.querySelector('.auton-card-title')?.textContent || 'Design Showcase';
       if (imgPath) {
@@ -560,4 +542,670 @@ function initDynamicContactForm() {
       }, 7000);
     }, 600);
   });
+}
+
+/* ==========================================================================
+   15. 3D STACKED EXPERIENCE CARDS CAROUSEL (Framer Deck Style)
+   ========================================================================== */
+function initExperienceDeckCarousel() {
+  const container = document.getElementById('exp-stack-container');
+  const cards = document.querySelectorAll('.exp-stack-card');
+  const prevBtn = document.getElementById('exp-prev-btn');
+  const nextBtn = document.getElementById('exp-next-btn');
+  const dots = document.querySelectorAll('.exp-dot');
+  const counter = document.getElementById('exp-current-counter');
+
+  if (!container || !cards.length) return;
+
+  let currentIdx = 0;
+  let isAnimating = false;
+  const totalCards = cards.length;
+
+  function updateContainerHeight() {
+    let maxHeight = 0;
+    cards.forEach((card) => {
+      const h = card.offsetHeight;
+      if (h > maxHeight) maxHeight = h;
+    });
+    if (maxHeight > 0) {
+      container.style.minHeight = `${maxHeight + 20}px`;
+    }
+  }
+
+  function updateDeck(newIdx, direction = 'next') {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const prevActiveIdx = currentIdx;
+    currentIdx = (newIdx + totalCards) % totalCards;
+
+    const oldActiveCard = cards[prevActiveIdx];
+
+    // Apply smooth outgoing slide-to-back fading animation
+    if (direction === 'next') {
+      oldActiveCard.classList.add('slide-to-back');
+    } else if (direction === 'prev') {
+      oldActiveCard.classList.add('slide-to-prev');
+    }
+
+    setTimeout(() => {
+      cards.forEach((card, idx) => {
+        card.classList.remove('is-active', 'is-next', 'is-prev', 'is-hidden', 'slide-to-back', 'slide-to-prev');
+
+        const rel = (idx - currentIdx + totalCards) % totalCards;
+
+        if (rel === 0) {
+          card.classList.add('is-active');
+        } else if (rel === 1) {
+          card.classList.add('is-next');
+        } else if (rel === totalCards - 1) {
+          card.classList.add('is-prev');
+        } else {
+          card.classList.add('is-hidden');
+        }
+      });
+
+      // Update indicator dots & number counter
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentIdx);
+      });
+
+      if (counter) {
+        counter.textContent = String(currentIdx + 1).padStart(2, '0');
+      }
+
+      isAnimating = false;
+    }, 280);
+  }
+
+  // Initial layout configuration
+  function initPositions() {
+    cards.forEach((card, idx) => {
+      card.classList.remove('is-active', 'is-next', 'is-prev', 'is-hidden', 'slide-to-back', 'slide-to-prev');
+      const rel = (idx - currentIdx + totalCards) % totalCards;
+      if (rel === 0) {
+        card.classList.add('is-active');
+      } else if (rel === 1) {
+        card.classList.add('is-next');
+      } else if (rel === totalCards - 1) {
+        card.classList.add('is-prev');
+      } else {
+        card.classList.add('is-hidden');
+      }
+    });
+
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === currentIdx);
+    });
+
+    if (counter) {
+      counter.textContent = String(currentIdx + 1).padStart(2, '0');
+    }
+
+    // Call after render tick so cards have accurate layout heights
+    setTimeout(updateContainerHeight, 80);
+  }
+
+  // Next / Prev Button Controls
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx + 1, 'next');
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx - 1, 'prev');
+    });
+  }
+
+  // Dot Indicator Controls
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetIdx = parseInt(dot.getAttribute('data-index'), 10);
+      if (targetIdx !== currentIdx) {
+        updateDeck(targetIdx, targetIdx > currentIdx ? 'next' : 'prev');
+      }
+    });
+  });
+
+  // Clicking on the peeking side cards directly navigates
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('is-next')) {
+        updateDeck(currentIdx + 1, 'next');
+      } else if (card.classList.contains('is-prev')) {
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    });
+  });
+
+  // Keyboard navigation when section is in viewport
+  const expSection = document.getElementById('experience');
+  if (expSection) {
+    window.addEventListener('keydown', (e) => {
+      const rect = expSection.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+
+      if (e.key === 'ArrowRight') {
+        updateDeck(currentIdx + 1, 'next');
+      } else if (e.key === 'ArrowLeft') {
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    });
+  }
+
+  // Mobile Touch Swipe Handling
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  container.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - touchEndY;
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+      if (diffX > 0) {
+        updateDeck(currentIdx + 1, 'next');
+      } else {
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', updateContainerHeight);
+
+  // Initialize deck layout
+  initPositions();
+}
+
+/* ==========================================================================
+   11. SKILLS: VERTICAL 3D CARD STACK CAROUSEL (BOTTOM-TO-TOP ROLLER)
+   ========================================================================== */
+function initSkillsVerticalStack() {
+  const container = document.getElementById('skill-stack-container');
+  if (!container) return;
+
+  const cards = Array.from(container.querySelectorAll('.skill-stack-card'));
+  const prevBtn = document.getElementById('skill-prev-btn');
+  const nextBtn = document.getElementById('skill-next-btn');
+  const dotsContainer = document.getElementById('skill-dots-container');
+  const dots = dotsContainer ? Array.from(dotsContainer.querySelectorAll('.skill-dot')) : [];
+  const counter = document.getElementById('skill-current-counter');
+
+  const totalCards = cards.length;
+  if (totalCards === 0) return;
+
+  let currentIdx = 0;
+  let isAnimating = false;
+
+  // Dynamically size container based on card heights + vertical stack offset
+  function updateContainerHeight() {
+    let maxHeight = 0;
+    cards.forEach((card) => {
+      const h = card.offsetHeight;
+      if (h > maxHeight) maxHeight = h;
+    });
+    if (maxHeight > 0) {
+      const extraOffset = window.innerWidth <= 640 ? 220 : 300;
+      container.style.minHeight = `${Math.max(520, maxHeight + extraOffset)}px`;
+    }
+  }
+
+  // Update card positions, classes, active states and counter
+  function applyClasses() {
+    cards.forEach((card, idx) => {
+      card.classList.remove(
+        'is-active',
+        'is-prev',
+        'is-next',
+        'is-far-prev',
+        'is-far-next',
+        'is-hidden',
+        'is-hidden-top',
+        'is-hidden-bottom',
+        'slide-up-exit',
+        'slide-down-exit'
+      );
+
+      const rel = (idx - currentIdx + totalCards) % totalCards;
+
+      if (rel === 0) {
+        card.classList.add('is-active');
+      } else if (rel === 1) {
+        card.classList.add('is-next');
+      } else if (rel === 2) {
+        card.classList.add('is-far-next');
+      } else if (rel === totalCards - 1) {
+        card.classList.add('is-prev');
+      } else if (rel === totalCards - 2) {
+        card.classList.add('is-far-prev');
+      } else if (rel > 2 && rel <= Math.floor(totalCards / 2)) {
+        card.classList.add('is-hidden-bottom');
+      } else {
+        card.classList.add('is-hidden-top');
+      }
+    });
+
+    // Update indicator dots
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === currentIdx);
+    });
+
+    // Update counter (e.g. 01, 02... 08)
+    if (counter) {
+      counter.textContent = String(currentIdx + 1).padStart(2, '0');
+    }
+  }
+
+  function updateDeck(newIdx, direction = 'next') {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    currentIdx = (newIdx + totalCards) % totalCards;
+    applyClasses();
+
+    setTimeout(() => {
+      isAnimating = false;
+    }, 450);
+  }
+
+  // Initial layout configuration
+  function initPositions() {
+    applyClasses();
+    setTimeout(updateContainerHeight, 80);
+  }
+
+  // Navigation button controls:
+  // Next btn (down arrow) brings skills up from bottom to top
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx + 1, 'next');
+    });
+  }
+
+  // Prev btn (up arrow) rolls reverse (top down)
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx - 1, 'prev');
+    });
+  }
+
+  // Dot indicator click controls
+  dots.forEach((dot) => {
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetIdx = parseInt(dot.getAttribute('data-index'), 10);
+      if (targetIdx !== currentIdx) {
+        updateDeck(targetIdx, targetIdx > currentIdx ? 'next' : 'prev');
+      }
+    });
+  });
+
+  // Clicking directly on visible peeking cards navigates to them
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      if (card.classList.contains('is-next')) {
+        updateDeck(currentIdx + 1, 'next');
+      } else if (card.classList.contains('is-far-next')) {
+        updateDeck(currentIdx + 2, 'next');
+      } else if (card.classList.contains('is-prev')) {
+        updateDeck(currentIdx - 1, 'prev');
+      } else if (card.classList.contains('is-far-prev')) {
+        updateDeck(currentIdx - 2, 'prev');
+      }
+    });
+
+    // Spotlight cursor tracking for active & hovering skill cards
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--skill-x', `${x}px`);
+      card.style.setProperty('--skill-y', `${y}px`);
+    });
+  });
+
+  // Keyboard navigation when Skills section is in viewport
+  const skillSection = document.getElementById('skills');
+  if (skillSection) {
+    window.addEventListener('keydown', (e) => {
+      const rect = skillSection.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        updateDeck(currentIdx + 1, 'next');
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    });
+  }
+
+  // Mouse wheel scroll handler over skills container (debounced)
+  let lastWheelTime = 0;
+  container.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    if (now - lastWheelTime < 450) return;
+
+    if (Math.abs(e.deltaY) > 25) {
+      if (e.deltaY > 0) {
+        // Scrolling down -> skills roll from bottom to top
+        lastWheelTime = now;
+        updateDeck(currentIdx + 1, 'next');
+      } else {
+        // Scrolling up -> skills roll reverse
+        lastWheelTime = now;
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    }
+  }, { passive: true });
+
+  // Mobile Touch Swipe Handling (Vertical)
+  let touchStartY = 0;
+  let touchStartX = 0;
+
+  container.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+
+    const diffY = touchStartY - touchEndY;
+    const diffX = touchStartX - touchEndX;
+
+    // Detect vertical swipe
+    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 35) {
+      if (diffY > 0) {
+        // Swiped up -> next skill comes up from bottom
+        updateDeck(currentIdx + 1, 'next');
+      } else {
+        // Swiped down -> previous skill
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', updateContainerHeight);
+
+  // Initialize positions on load
+  initPositions();
+}
+
+/* ==========================================================================
+   12. MY WORK / PROJECTS: VERTICAL 3D CARD STACK CAROUSEL (BOTTOM-TO-TOP ROLLER)
+   ========================================================================== */
+function initWorkVerticalStack() {
+  const container = document.getElementById('work-stack-container');
+  if (!container) return;
+
+  const allCards = Array.from(container.querySelectorAll('.work-stack-card'));
+  const prevBtn = document.getElementById('work-prev-btn');
+  const nextBtn = document.getElementById('work-next-btn');
+  const dotsContainer = document.getElementById('work-dots-container');
+  const currentCounter = document.getElementById('work-current-counter');
+  const totalCounter = document.getElementById('work-total-counter');
+  const filterBtns = document.querySelectorAll('.auton-filter-btn');
+
+  let activeCards = [...allCards];
+  let currentIdx = 0;
+  let isAnimating = false;
+
+  function updateContainerHeight() {
+    let maxHeight = 0;
+    activeCards.forEach((card) => {
+      const h = card.offsetHeight;
+      if (h > maxHeight) maxHeight = h;
+    });
+    if (maxHeight > 0) {
+      const extraOffset = window.innerWidth <= 640 ? 240 : 320;
+      container.style.minHeight = `${Math.max(620, maxHeight + extraOffset)}px`;
+    }
+  }
+
+  function renderDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    activeCards.forEach((_, idx) => {
+      const dot = document.createElement('button');
+      dot.className = `work-dot ${idx === currentIdx ? 'active' : ''}`;
+      dot.setAttribute('data-index', idx);
+      dot.setAttribute('aria-label', `Work Project ${idx + 1}`);
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (idx !== currentIdx) {
+          updateDeck(idx, idx > currentIdx ? 'next' : 'prev');
+        }
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  function applyClasses() {
+    const total = activeCards.length;
+    if (total === 0) return;
+
+    // Reset hidden cards not in active filter
+    allCards.forEach((card) => {
+      if (!activeCards.includes(card)) {
+        card.className = 'auton-project-card work-stack-card is-hidden group';
+        card.style.display = 'none';
+      } else {
+        card.style.display = '';
+      }
+    });
+
+    activeCards.forEach((card, idx) => {
+      card.classList.remove(
+        'is-active',
+        'is-prev',
+        'is-next',
+        'is-far-prev',
+        'is-far-next',
+        'is-hidden',
+        'is-hidden-top',
+        'is-hidden-bottom',
+        'slide-up-exit',
+        'slide-down-exit'
+      );
+
+      const rel = (idx - currentIdx + total) % total;
+
+      if (rel === 0) {
+        card.classList.add('is-active');
+      } else if (rel === 1) {
+        card.classList.add('is-next');
+      } else if (rel === 2 && total > 2) {
+        card.classList.add('is-far-next');
+      } else if (rel === total - 1) {
+        card.classList.add('is-prev');
+      } else if (rel === total - 2 && total > 3) {
+        card.classList.add('is-far-prev');
+      } else if (rel > 2 && rel <= Math.floor(total / 2)) {
+        card.classList.add('is-hidden-bottom');
+      } else {
+        card.classList.add('is-hidden-top');
+      }
+    });
+
+    // Update dots
+    if (dotsContainer) {
+      const dots = dotsContainer.querySelectorAll('.work-dot');
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle('active', idx === currentIdx);
+      });
+    }
+
+    // Update counters
+    if (currentCounter) {
+      currentCounter.textContent = String(currentIdx + 1).padStart(2, '0');
+    }
+    if (totalCounter) {
+      totalCounter.textContent = String(total).padStart(2, '0');
+    }
+  }
+
+  function updateDeck(newIdx, direction = 'next') {
+    if (isAnimating) return;
+    const total = activeCards.length;
+    if (total === 0) return;
+
+    isAnimating = true;
+    currentIdx = (newIdx + total) % total;
+    applyClasses();
+
+    setTimeout(() => {
+      isAnimating = false;
+    }, 450);
+  }
+
+  // Filter tabs handling
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filterVal = btn.getAttribute('data-filter');
+      if (filterVal === 'all') {
+        activeCards = [...allCards];
+      } else {
+        activeCards = allCards.filter(card => card.getAttribute('data-category') === filterVal);
+      }
+
+      currentIdx = 0;
+      renderDots();
+      applyClasses();
+      setTimeout(updateContainerHeight, 80);
+    });
+  });
+
+  // Buttons
+  if (nextBtn) {
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx + 1, 'next');
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      updateDeck(currentIdx - 1, 'prev');
+    });
+  }
+
+  // Clicking on cards:
+  // If inactive card is clicked -> roll it to active!
+  // If active card is clicked -> open lightbox!
+  allCards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (card.classList.contains('is-next')) {
+        e.stopPropagation();
+        updateDeck(currentIdx + 1, 'next');
+      } else if (card.classList.contains('is-far-next')) {
+        e.stopPropagation();
+        updateDeck(currentIdx + 2, 'next');
+      } else if (card.classList.contains('is-prev')) {
+        e.stopPropagation();
+        updateDeck(currentIdx - 1, 'prev');
+      } else if (card.classList.contains('is-far-prev')) {
+        e.stopPropagation();
+        updateDeck(currentIdx - 2, 'prev');
+      }
+    });
+
+    // Spotlight cursor tracking
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--card-x', `${x}px`);
+      card.style.setProperty('--card-y', `${y}px`);
+    });
+  });
+
+  // Keyboard navigation when Projects / My Work section is in viewport
+  const projectSection = document.getElementById('projects');
+  if (projectSection) {
+    window.addEventListener('keydown', (e) => {
+      const rect = projectSection.getBoundingClientRect();
+      const inView = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!inView) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        e.preventDefault();
+        updateDeck(currentIdx + 1, 'next');
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault();
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    });
+  }
+
+  // Mouse wheel scroll handler over container (debounced)
+  let lastWheelTime = 0;
+  container.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    if (now - lastWheelTime < 450) return;
+
+    if (Math.abs(e.deltaY) > 25) {
+      if (e.deltaY > 0) {
+        lastWheelTime = now;
+        updateDeck(currentIdx + 1, 'next');
+      } else {
+        lastWheelTime = now;
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    }
+  }, { passive: true });
+
+  // Mobile Touch Swipe Handling (Vertical)
+  let touchStartY = 0;
+  let touchStartX = 0;
+
+  container.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+
+    const diffY = touchStartY - touchEndY;
+    const diffX = touchStartX - touchEndX;
+
+    if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 35) {
+      if (diffY > 0) {
+        updateDeck(currentIdx + 1, 'next');
+      } else {
+        updateDeck(currentIdx - 1, 'prev');
+      }
+    }
+  }, { passive: true });
+
+  window.addEventListener('resize', updateContainerHeight);
+
+  // Initialize
+  renderDots();
+  applyClasses();
+  setTimeout(updateContainerHeight, 80);
 }

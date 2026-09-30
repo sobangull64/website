@@ -557,6 +557,282 @@ body.cursor-view .custom-cursor-follower .cursor-text {
 }
 
 /* ==========================================================================
+   SKILLS SECTION: VERTICAL 3D CARD STACK (BOTTOM-TO-TOP ROLLER)
+   ========================================================================== */
+.skill-carousel-wrapper {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skill-stack-stage {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  min-height: 480px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .skill-stack-stage {
+    min-height: 520px;
+  }
+}
+
+.skill-stack-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 640px;
+  border-radius: 28px;
+  background: #141414;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.55s ease,
+              box-shadow 0.55s ease,
+              border-color 0.4s ease,
+              background 0.4s ease;
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+  filter: grayscale(100%);
+}
+
+.skill-stack-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 42, 59, 0.4), transparent);
+  transition: left 0.7s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.skill-stack-card:hover::before {
+  left: 120%;
+}
+
+/* 1. Center Active Front Card (Full Color & Glow) */
+.skill-stack-card.is-active {
+  transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg) !important;
+  z-index: 30;
+  opacity: 1;
+  pointer-events: auto;
+  cursor: default;
+  border-color: rgba(255, 42, 59, 0.65);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 42, 59, 0.4);
+  background: #181112;
+  filter: grayscale(0%) brightness(1);
+}
+
+.skill-stack-card.is-active:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 30px 75px -15px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 42, 59, 0.55);
+}
+
+.skill-stack-card.is-active .skill-box-icon {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 25px rgba(255, 42, 59, 0.7);
+  transform: scale(1.1) rotate(6deg);
+}
+
+.skill-stack-card.is-active .skill-progress-bar {
+  transform: scaleX(1);
+}
+
+.skill-stack-card.is-active .skill-badge {
+  background: rgba(255, 42, 59, 0.15);
+  color: #FFA4AC;
+  border-color: rgba(255, 42, 59, 0.4);
+}
+
+/* 2. Top Peeking Card (1 Step Above) */
+.skill-stack-card.is-prev {
+  transform: translate(-50%, calc(-50% - 72px)) translateZ(-80px) scale(0.92) rotate(-1.8deg) !important;
+  z-index: 20;
+  opacity: 0.65;
+  filter: grayscale(100%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.skill-stack-card.is-prev:hover {
+  transform: translate(-50%, calc(-50% - 84px)) translateZ(-60px) scale(0.94) rotate(-2.4deg) !important;
+  opacity: 0.88;
+  filter: grayscale(40%) brightness(0.85);
+  border-color: rgba(255, 42, 59, 0.35);
+}
+
+/* 3. Bottom Peeking Card (1 Step Below, Ready to Come Up) */
+.skill-stack-card.is-next {
+  transform: translate(-50%, calc(-50% + 72px)) translateZ(-80px) scale(0.92) rotate(1.8deg) !important;
+  z-index: 21;
+  opacity: 0.65;
+  filter: grayscale(100%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.skill-stack-card.is-next:hover {
+  transform: translate(-50%, calc(-50% + 84px)) translateZ(-60px) scale(0.94) rotate(2.4deg) !important;
+  opacity: 0.88;
+  filter: grayscale(40%) brightness(0.85);
+  border-color: rgba(255, 42, 59, 0.35);
+}
+
+/* 4. Far Cards (Layered Above and Below in the Stack) */
+.skill-stack-card.is-far-prev {
+  transform: translate(-50%, calc(-50% - 132px)) translateZ(-160px) scale(0.85) rotate(-3.2deg) !important;
+  z-index: 10;
+  opacity: 0.3;
+  filter: grayscale(100%) brightness(0.45);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.skill-stack-card.is-far-next {
+  transform: translate(-50%, calc(-50% + 132px)) translateZ(-160px) scale(0.85) rotate(3.2deg) !important;
+  z-index: 10;
+  opacity: 0.3;
+  filter: grayscale(100%) brightness(0.45);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.skill-stack-card.is-active .skill-meter-val {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(255, 42, 59, 0.6);
+}
+
+.skill-stack-card:hover .skill-card-spotlight,
+.skill-stack-card.is-active .skill-card-spotlight {
+  opacity: 1;
+}
+
+/* 5. Deep Background Hidden Queue (Directional Offscreen Buffers) */
+.skill-stack-card.is-hidden,
+.skill-stack-card.is-hidden-bottom {
+  transform: translate(-50%, calc(-50% + 200px)) translateZ(-220px) scale(0.78) rotate(3deg) !important;
+  z-index: 4;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.skill-stack-card.is-hidden-top {
+  transform: translate(-50%, calc(-50% - 200px)) translateZ(-220px) scale(0.78) rotate(-3deg) !important;
+  z-index: 4;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* 6. Dynamic Bottom-to-Top Slide & Fade Animation (Optional Exit Flare) */
+.skill-stack-card.slide-up-exit {
+  transform: translate(-50%, calc(-50% - 170px)) translateZ(-100px) scale(0.85) rotate(-5deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.44s ease !important;
+}
+
+.skill-stack-card.slide-down-exit {
+  transform: translate(-50%, calc(-50% + 170px)) translateZ(-100px) scale(0.85) rotate(5deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.44s ease !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .skill-stack-card {
+    width: 95%;
+  }
+  .skill-stack-card.is-prev {
+    transform: translate(-50%, calc(-50% - 50px)) translateZ(-60px) scale(0.94) rotate(-1deg) !important;
+  }
+  .skill-stack-card.is-next {
+    transform: translate(-50%, calc(-50% + 50px)) translateZ(-60px) scale(0.94) rotate(1deg) !important;
+  }
+  .skill-stack-card.is-far-prev {
+    transform: translate(-50%, calc(-50% - 95px)) translateZ(-120px) scale(0.88) rotate(-2deg) !important;
+  }
+  .skill-stack-card.is-far-next {
+    transform: translate(-50%, calc(-50% + 95px)) translateZ(-120px) scale(0.88) rotate(2deg) !important;
+  }
+  .skill-stack-card.is-hidden,
+  .skill-stack-card.is-hidden-bottom {
+    transform: translate(-50%, calc(-50% + 150px)) translateZ(-160px) scale(0.8) !important;
+  }
+  .skill-stack-card.is-hidden-top {
+    transform: translate(-50%, calc(-50% - 150px)) translateZ(-160px) scale(0.8) !important;
+  }
+}
+
+/* Skill Navigation Controls */
+.skill-nav-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #141414;
+  border: 1.5px solid rgba(255, 42, 59, 0.4);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 42, 59, 0.2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.skill-nav-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: scale(1.12);
+  box-shadow: 0 0 25px rgba(255, 42, 59, 0.7);
+  color: #FFFFFF;
+}
+
+.skill-nav-btn:active {
+  transform: scale(0.94);
+}
+
+.skill-dot {
+  height: 5px;
+  width: 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.skill-dot.active {
+  width: 28px;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary);
+}
+
+.skill-dot:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
    EDUCATION & EXPERIENCE: MODERN CONTINUOUS 3D CARDS & TIMELINE (Black & Red)
    ========================================================================== */
 .edu-card, .exp-card {
@@ -683,8 +959,199 @@ body.cursor-view .custom-cursor-follower .cursor-text {
 }
 
 /* ==========================================================================
-   EXPERIENCE SECTION (Continuous Flow Grid & 3D Interactive Cards)
+   EXPERIENCE SECTION (3D STACKED CARD DECK CAROUSEL - FRAMER STYLE)
    ========================================================================== */
+.exp-carousel-wrapper {
+  width: 100%;
+}
+
+.exp-stack-stage {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  min-height: 440px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .exp-stack-stage {
+    min-height: 520px;
+  }
+}
+
+.exp-stack-card {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 680px;
+  border-radius: 28px;
+  background: #141414;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.55s ease,
+              box-shadow 0.55s ease,
+              border-color 0.4s ease,
+              background 0.4s ease;
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* 1. Active Front Card */
+.exp-stack-card.is-active {
+  transform: translate(-50%, 0) translateZ(0) scale(1) rotate(0deg) !important;
+  z-index: 30;
+  opacity: 1;
+  pointer-events: auto;
+  cursor: default;
+  border-color: rgba(255, 42, 59, 0.6);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 42, 59, 0.35);
+  background: #161112;
+  filter: grayscale(0%) brightness(1);
+}
+
+.exp-stack-card.is-active:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 42, 59, 0.5);
+}
+
+/* 2. Next Card Peeking Behind to the Right */
+.exp-stack-card.is-next {
+  transform: translate(calc(-50% + 56px), 16px) translateZ(-90px) scale(0.92) rotate(3.5deg) !important;
+  z-index: 20;
+  opacity: 0.65;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: grayscale(70%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.exp-stack-card.is-next:hover {
+  transform: translate(calc(-50% + 72px), 12px) translateZ(-70px) scale(0.94) rotate(4.2deg) !important;
+  opacity: 0.9;
+  filter: grayscale(20%) brightness(0.9);
+  border-color: rgba(255, 42, 59, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 42, 59, 0.2);
+}
+
+/* 3. Prev Card Peeking Behind to the Left */
+.exp-stack-card.is-prev {
+  transform: translate(calc(-50% - 56px), 16px) translateZ(-90px) scale(0.92) rotate(-3.5deg) !important;
+  z-index: 19;
+  opacity: 0.65;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: grayscale(70%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.exp-stack-card.is-prev:hover {
+  transform: translate(calc(-50% - 72px), 12px) translateZ(-70px) scale(0.94) rotate(-4.2deg) !important;
+  opacity: 0.9;
+  filter: grayscale(20%) brightness(0.9);
+  border-color: rgba(255, 42, 59, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 42, 59, 0.2);
+}
+
+/* 4. Queued / Hidden Card (Layered Deep in the Deck) */
+.exp-stack-card.is-hidden {
+  transform: translate(-50%, 28px) translateZ(-180px) scale(0.84) rotate(0deg) !important;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 5. Smooth Slide to Back Fading Animation (Triggered on Next) */
+.exp-stack-card.slide-to-back {
+  transform: translate(calc(-50% - 140px), -24px) translateZ(-120px) scale(0.86) rotate(-8deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.42s ease !important;
+}
+
+/* 6. Smooth Slide to Back Fading Animation (Triggered on Prev) */
+.exp-stack-card.slide-to-prev {
+  transform: translate(calc(-50% + 140px), -24px) translateZ(-120px) scale(0.86) rotate(8deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.42s ease !important;
+}
+
+/* Responsive Offsets for Smaller Screens */
+@media (max-width: 640px) {
+  .exp-stack-card {
+    width: 95%;
+  }
+  .exp-stack-card.is-next {
+    transform: translate(calc(-50% + 22px), 12px) translateZ(-60px) scale(0.94) rotate(2deg) !important;
+  }
+  .exp-stack-card.is-prev {
+    transform: translate(calc(-50% - 22px), 12px) translateZ(-60px) scale(0.94) rotate(-2deg) !important;
+  }
+  .exp-stack-card.slide-to-back {
+    transform: translate(calc(-50% - 70px), -16px) translateZ(-80px) scale(0.9) rotate(-5deg) !important;
+  }
+  .exp-stack-card.slide-to-prev {
+    transform: translate(calc(-50% + 70px), -16px) translateZ(-80px) scale(0.9) rotate(5deg) !important;
+  }
+}
+
+/* Navigation Buttons & Indicators */
+.exp-nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #141414;
+  border: 1.5px solid rgba(255, 42, 59, 0.4);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 42, 59, 0.2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.exp-nav-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: scale(1.12);
+  box-shadow: 0 0 25px rgba(255, 42, 59, 0.7);
+  color: #FFFFFF;
+}
+
+.exp-nav-btn:active {
+  transform: scale(0.94);
+}
+
+.exp-dot {
+  height: 5px;
+  width: 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.exp-dot.active {
+  width: 34px;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary);
+}
+
+.exp-dot:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.5);
+}
 
 /* ==========================================================================
    AUTON FRAMER STYLE: PROJECTS & MY WORK SHOWCASE (Black & Red Luxury)
@@ -714,24 +1181,75 @@ body.cursor-view .custom-cursor-follower .cursor-text {
   box-shadow: 0 4px 20px rgba(255, 42, 59, 0.45);
 }
 
-.auton-project-card {
+/* ==========================================================================
+   MY WORK SECTION: VERTICAL 3D CARD STACK (BOTTOM-TO-TOP ROLLER)
+   ========================================================================== */
+.work-carousel-wrapper {
+  width: 100%;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.work-stack-stage {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+  min-height: 640px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .work-stack-stage {
+    min-height: 560px;
+  }
+}
+
+.work-stack-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 880px;
+  border-radius: 28px;
   background: #141414;
   border: 1.5px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  padding: 1.25rem;
-  overflow: hidden;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-              box-shadow 0.45s ease,
-              border-color 0.4s ease,
-              background 0.4s ease,
-              opacity 0.4s ease,
-              filter 0.4s ease;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
   transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+              filter 0.55s ease,
+              box-shadow 0.55s ease,
+              border-color 0.4s ease,
+              background 0.4s ease;
+  user-select: none;
   cursor: pointer;
+  overflow: hidden;
+  filter: grayscale(100%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.work-stack-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 42, 59, 0.35), transparent);
+  transition: left 0.7s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.work-stack-card:hover::before {
+  left: 120%;
 }
 
 .auton-card-spotlight {
@@ -745,21 +1263,213 @@ body.cursor-view .custom-cursor-follower .cursor-text {
   z-index: 1;
 }
 
-.auton-project-card:hover .auton-card-spotlight {
+.work-stack-card:hover .auton-card-spotlight,
+.work-stack-card.is-active .auton-card-spotlight {
   opacity: 1;
 }
 
-.auton-project-card:hover {
-  transform: translateY(-8px);
-  border-color: var(--color-primary);
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 42, 59, 0.35);
+/* 1. Center Active Front Card (Full Color & Glow) */
+.work-stack-card.is-active {
+  transform: translate(-50%, -50%) translateZ(0) scale(1) rotate(0deg) !important;
+  z-index: 30;
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  border-color: rgba(255, 42, 59, 0.65);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 42, 59, 0.4);
   background: #181112;
+  filter: grayscale(0%) brightness(1);
+}
+
+.work-stack-card.is-active:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 30px 75px -15px rgba(0, 0, 0, 0.95), 0 0 45px rgba(255, 42, 59, 0.55);
+}
+
+.work-stack-card.is-active .auton-card-img {
+  filter: grayscale(0%) contrast(100%);
+  transform: scale(1.02);
+}
+
+.work-stack-card.is-active .auton-arrow-btn {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px rgba(255, 42, 59, 0.7);
+  transform: rotate(45deg) scale(1.08);
+}
+
+.work-stack-card.is-active .auton-pill-tag {
+  border-color: rgba(255, 42, 59, 0.6);
+  color: #FFA4AC;
+}
+
+/* 2. Top Peeking Card (1 Step Above) */
+.work-stack-card.is-prev {
+  transform: translate(-50%, calc(-50% - 75px)) translateZ(-80px) scale(0.93) rotate(-1.5deg) !important;
+  z-index: 20;
+  opacity: 0.65;
+  filter: grayscale(100%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.work-stack-card.is-prev:hover {
+  transform: translate(-50%, calc(-50% - 88px)) translateZ(-60px) scale(0.95) rotate(-2deg) !important;
+  opacity: 0.88;
+  filter: grayscale(40%) brightness(0.85);
+  border-color: rgba(255, 42, 59, 0.35);
+}
+
+/* 3. Bottom Peeking Card (1 Step Below, Ready to Come Up) */
+.work-stack-card.is-next {
+  transform: translate(-50%, calc(-50% + 75px)) translateZ(-80px) scale(0.93) rotate(1.5deg) !important;
+  z-index: 21;
+  opacity: 0.65;
+  filter: grayscale(100%) brightness(0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.work-stack-card.is-next:hover {
+  transform: translate(-50%, calc(-50% + 88px)) translateZ(-60px) scale(0.95) rotate(2deg) !important;
+  opacity: 0.88;
+  filter: grayscale(40%) brightness(0.85);
+  border-color: rgba(255, 42, 59, 0.35);
+}
+
+/* 4. Far Cards (Layered Above and Below in the Stack) */
+.work-stack-card.is-far-prev {
+  transform: translate(-50%, calc(-50% - 140px)) translateZ(-160px) scale(0.86) rotate(-2.6deg) !important;
+  z-index: 10;
+  opacity: 0.35;
+  filter: grayscale(100%) brightness(0.45);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.work-stack-card.is-far-next {
+  transform: translate(-50%, calc(-50% + 140px)) translateZ(-160px) scale(0.86) rotate(2.6deg) !important;
+  z-index: 10;
+  opacity: 0.35;
+  filter: grayscale(100%) brightness(0.45);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* 5. Deep Background Hidden Queue (Directional Offscreen Buffers) */
+.work-stack-card.is-hidden,
+.work-stack-card.is-hidden-bottom {
+  transform: translate(-50%, calc(-50% + 230px)) translateZ(-220px) scale(0.78) rotate(3deg) !important;
+  z-index: 4;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.work-stack-card.is-hidden-top {
+  transform: translate(-50%, calc(-50% - 230px)) translateZ(-220px) scale(0.78) rotate(-3deg) !important;
+  z-index: 4;
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* 6. Dynamic Slide Exits */
+.work-stack-card.slide-up-exit {
+  transform: translate(-50%, calc(-50% - 190px)) translateZ(-100px) scale(0.85) rotate(-5deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.44s ease !important;
+}
+
+.work-stack-card.slide-down-exit {
+  transform: translate(-50%, calc(-50% + 190px)) translateZ(-100px) scale(0.85) rotate(5deg) !important;
+  opacity: 0 !important;
+  z-index: 25 !important;
+  transition: transform 0.44s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.44s ease !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .work-stack-card {
+    width: 95%;
+  }
+  .work-stack-card.is-prev {
+    transform: translate(-50%, calc(-50% - 60px)) translateZ(-60px) scale(0.93) rotate(-1deg) !important;
+  }
+  .work-stack-card.is-next {
+    transform: translate(-50%, calc(-50% + 60px)) translateZ(-60px) scale(0.93) rotate(1deg) !important;
+  }
+  .work-stack-card.is-far-prev {
+    transform: translate(-50%, calc(-50% - 110px)) translateZ(-120px) scale(0.86) rotate(-2deg) !important;
+  }
+  .work-stack-card.is-far-next {
+    transform: translate(-50%, calc(-50% + 110px)) translateZ(-120px) scale(0.86) rotate(2deg) !important;
+  }
+  .work-stack-card.is-hidden,
+  .work-stack-card.is-hidden-bottom {
+    transform: translate(-50%, calc(-50% + 160px)) translateZ(-160px) scale(0.8) !important;
+  }
+  .work-stack-card.is-hidden-top {
+    transform: translate(-50%, calc(-50% - 160px)) translateZ(-160px) scale(0.8) !important;
+  }
+}
+
+/* Work Navigation Controls */
+.work-nav-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #141414;
+  border: 1.5px solid rgba(255, 42, 59, 0.4);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 42, 59, 0.2);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.work-nav-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  transform: scale(1.12);
+  box-shadow: 0 0 25px rgba(255, 42, 59, 0.7);
+  color: #FFFFFF;
+}
+
+.work-nav-btn:active {
+  transform: scale(0.94);
+}
+
+.work-dot {
+  height: 5px;
+  width: 14px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.work-dot.active {
+  width: 28px;
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary);
+}
+
+.work-dot:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .auton-card-image-wrap {
   position: relative;
   width: 100%;
-  height: 310px;
+  height: 275px;
   border-radius: 20px;
   overflow: hidden;
   background: #000000;
@@ -770,15 +1480,15 @@ body.cursor-view .custom-cursor-follower .cursor-text {
 }
 
 .auton-wide-wrap {
-  height: 360px;
+  height: 275px;
 }
 
 @media (max-width: 640px) {
   .auton-card-image-wrap {
-    height: 230px;
+    height: 210px;
   }
   .auton-wide-wrap {
-    height: 250px;
+    height: 210px;
   }
 }
 
